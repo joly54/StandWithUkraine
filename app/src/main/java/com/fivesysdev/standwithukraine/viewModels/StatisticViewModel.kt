@@ -1,24 +1,26 @@
 package com.fivesysdev.standwithukraine.viewModels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.fivesysdev.standwithukraine.data.ApiService
 import com.fivesysdev.standwithukraine.models.Statistic
-import com.fivesysdev.standwithukraine.retrofit.RetrofitClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.fivesysdev.standwithukraine.states.StatisticState
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class StatisticViewModel : ViewModel() {
-    private val apiService = RetrofitClient.apiService
-
+class StatisticViewModel(
+    private val apiService: ApiService
+) : ViewModel() {
     private val _statistic = MutableLiveData<Statistic?>()
-    private val _isDataLoaded = MutableLiveData<Boolean>()
+    private val _statisticState = MutableLiveData<StatisticState>()
+    val state: LiveData<StatisticState>
+        get() = _statisticState
 
     val statistic: MutableLiveData<Statistic?> = _statistic
-    val isDataLoaded: MutableLiveData<Boolean> = _isDataLoaded
 
     private val currentDate: String
         get() {
@@ -32,27 +34,25 @@ class StatisticViewModel : ViewModel() {
         dateFrom: String = currentDate,
         dateTo: String = currentDate
     ) {
-        val call = apiService.getStatistics(offset, limit, dateFrom, dateTo)
+        viewModelScope.launch {
+            _statisticState.value = StatisticState.Loading
+            try {
+                val response = apiService.getStatistics(offset, limit, dateFrom, dateTo)
 
-        call.enqueue(object : Callback<Statistic> {
-            override fun onResponse(call: Call<Statistic>, response: Response<Statistic>) {
-                if (response.isSuccessful) {
-                    _statistic.value = response.body()
-                    _isDataLoaded.value = true
-                    println(response.body())
-                    println("Success isDataLoaded: ${_isDataLoaded.value}")
+                if (response != null) {
+                    _statistic.value = response
+                    _statisticState.value = StatisticState.Success(response)
                 } else {
-                    _statistic.value = Statistic(null, response.message())
-                    println("Error isDataLoaded: ${_isDataLoaded.value}")
+                    _statisticState.value = StatisticState.Error("Empty response")
+                    _statistic.value = Statistic(null, "Empty response")
                 }
-            }
-
-            override fun onFailure(call: Call<Statistic>, t: Throwable) {
-                _statistic.value = Statistic(null, t.message.toString())
-                println(t.message)
-                println("Error isDataLoaded: ${_isDataLoaded.value}")
+            } catch (e: Exception) {
+                _statisticState.value = StatisticState.Error(e.message.toString())
+                _statistic.value = Statistic(null, e.message.toString())
+                println(e.message)
             }
         }
-        )
     }
+
 }
+

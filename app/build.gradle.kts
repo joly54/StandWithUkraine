@@ -54,4 +54,5 @@ dependencies {
     implementation(libs.bundles.ui)
     implementation(libs.bundles.network)
     implementation(platform(libs.compose.bom))
+    implementation(libs.bundles.di)
 }
