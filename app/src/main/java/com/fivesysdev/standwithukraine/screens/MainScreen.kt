@@ -29,6 +29,7 @@ import com.fivesysdev.standwithukraine.models.Record
 import com.fivesysdev.standwithukraine.models.Statistic
 import com.fivesysdev.standwithukraine.states.StatisticState
 import com.fivesysdev.standwithukraine.viewModels.StatisticViewModel
+import org.koin.androidx.compose.getViewModel
 
 class MainScreen {
     @Composable
@@ -135,7 +136,7 @@ class MainScreen {
 
     @Composable
     fun Screen() {
-        val viewModel: StatisticViewModel = viewModel()
+        val viewModel = getViewModel<StatisticViewModel>()
         val statistic by viewModel.statistic.observeAsState(initial = Statistic(null, ""))
         val statisticState by viewModel.state.observeAsState(initial = StatisticState.Loading)
         LaunchedEffect(key1 = Unit) {
