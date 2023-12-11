@@ -7,29 +7,43 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fivesysdev.standwithukraine.models.Record
 import com.fivesysdev.standwithukraine.models.Statistic
 import com.fivesysdev.standwithukraine.states.StatisticState
 import com.fivesysdev.standwithukraine.viewModels.StatisticViewModel
 import org.koin.androidx.compose.getViewModel
+import java.text.SimpleDateFormat
 
 class MainScreen {
     @Composable
@@ -55,6 +69,52 @@ class MainScreen {
             ) {
                 Text(text = label, fontWeight = FontWeight.Bold)
                 Text(text = "$totalCount(+${increaseCount})")
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun DatePickerDialog(
+        visible: Boolean,
+        onDismissRequest: () -> Unit,
+        onConfirm: (Long) -> Unit,
+        onCancel: () -> Unit = {},
+    ) {
+        val snackState = remember { SnackbarHostState() }
+        SnackbarHost(hostState = snackState, Modifier)
+        if (visible) {
+            val datePickerState = rememberDatePickerState()
+            val confirmEnabled = remember {
+                derivedStateOf { datePickerState.selectedDateMillis != null }
+            }
+            DatePickerDialog(
+                onDismissRequest = onDismissRequest,
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            onConfirm(datePickerState.selectedDateMillis!!)
+
+                        },
+                        enabled = confirmEnabled.value
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = onCancel
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            ) {
+                DatePicker(
+                    state = datePickerState,
+                    dateValidator = {
+                        it <= System.currentTimeMillis()
+                    }
+                )
             }
         }
     }
@@ -100,8 +160,10 @@ class MainScreen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun DisplayData(
-        record: Record
+        record: Record,
+        onDateChange: (Long) -> Unit,
     ) {
+        var isDialogVisible by remember { mutableStateOf(false) }
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         val cardsData = generateCardsData(record)
         Scaffold(
@@ -113,12 +175,38 @@ class MainScreen {
                             text = "${record.date} (${record.day})",
                         )
                     },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                isDialogVisible = true
+                            }
+                        ) {
+                            Icon(
+                                Icons.Outlined.CalendarMonth,
+                                null
+                            )
+                        }
+                    },
                     scrollBehavior = scrollBehavior
                 )
             }
         ) {
+            DatePickerDialog(
+                visible = isDialogVisible,
+                onDismissRequest = {
+                    isDialogVisible = false
+                },
+                onConfirm = {
+                    isDialogVisible = false
+                    onDateChange(it)
+
+                },
+                onCancel = {
+                    isDialogVisible = false
+                }
+            )
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+                columns = GridCells.Adaptive(200.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
@@ -132,6 +220,11 @@ class MainScreen {
                 }
             }
         }
+    }
+
+    fun getDate(time: Long): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        return sdf.format(time)
     }
 
     @Composable
@@ -163,7 +256,10 @@ class MainScreen {
 
             is StatisticState.Success -> {
                 statistic?.data?.records?.firstOrNull()?.let {
-                    DisplayData(it)
+                    DisplayData(
+                        record = it,
+                        onDateChange = { viewModel.setDate(getDate(it)) },
+                    )
                 }
             }
         }

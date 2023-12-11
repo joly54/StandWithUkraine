@@ -17,10 +17,19 @@ class StatisticViewModel(
 ) : ViewModel() {
     private val _statistic = MutableLiveData<Statistic?>()
     private val _statisticState = MutableLiveData<StatisticState>()
+    private var _selectedDate: String = currentDate
     val state: LiveData<StatisticState>
         get() = _statisticState
 
     val statistic: MutableLiveData<Statistic?> = _statistic
+
+    fun setDate(date: String) {
+        _selectedDate = date
+        fetchStatistic()
+    }
+    fun getSelectedDate(): String {
+        return _selectedDate
+    }
 
     private val currentDate: String
         get() {
@@ -28,16 +37,14 @@ class StatisticViewModel(
             return sdf.format(Date())
         }
 
-    fun fetchStatistic(
-        offset: Int = 0,
-        limit: Int = 50,
-        dateFrom: String = currentDate,
-        dateTo: String = currentDate
-    ) {
+    fun fetchStatistic() {
         viewModelScope.launch {
+            if(_statistic.value?.data?.records?.firstOrNull()?.date == _selectedDate) {
+                return@launch
+            }
             _statisticState.value = StatisticState.Loading
             try {
-                val response = apiService.getStatistics(offset, limit, dateFrom, dateTo)
+                val response = apiService.getStatistics(0, 50, _selectedDate, _selectedDate)
 
                 if (response != null) {
                     _statistic.value = response
@@ -49,7 +56,7 @@ class StatisticViewModel(
             } catch (e: Exception) {
                 _statisticState.value = StatisticState.Error(e.message.toString())
                 _statistic.value = Statistic(null, e.message.toString())
-                println(e.message)
+                e.printStackTrace()
             }
         }
     }
