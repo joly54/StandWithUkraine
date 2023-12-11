@@ -199,13 +199,14 @@ class MainScreen {
                 onConfirm = {
                     isDialogVisible = false
                     onDateChange(it)
+
                 },
                 onCancel = {
                     isDialogVisible = false
                 }
             )
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+                columns = GridCells.Adaptive(200.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
@@ -231,7 +232,6 @@ class MainScreen {
         val viewModel = getViewModel<StatisticViewModel>()
         val statistic by viewModel.statistic.observeAsState(initial = Statistic(null, ""))
         val statisticState by viewModel.state.observeAsState(initial = StatisticState.Loading)
-        val selectedDate = remember { mutableStateOf(getDate(System.currentTimeMillis())) }
         LaunchedEffect(key1 = Unit) {
             viewModel.fetchStatistic()
         }
@@ -258,10 +258,7 @@ class MainScreen {
                 statistic?.data?.records?.firstOrNull()?.let {
                     DisplayData(
                         record = it,
-                        onDateChange = {
-                            selectedDate.value = getDate(it)
-                            viewModel.fetchStatistic(dateFrom = getDate(it), dateTo = getDate(it))
-                        }
+                        onDateChange = { viewModel.setDate(getDate(it)) },
                     )
                 }
             }
