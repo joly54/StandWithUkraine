@@ -1,5 +1,5 @@
 [versions]
-agp = "8.3.0-alpha16"
+agp = "8.2.0"
 kotlin = "1.9.20"
 core-ktx = "1.12.0"
 lifecycle-runtime-ktx = "2.6.2"
@@ -12,6 +12,7 @@ navigation-runtime-ktx = "2.7.5"
 live-data = "1.6.0-beta02"
 lifecycle-livedata-ktx = "2.6.2"
 retrofit = "2.9.0"
+koin = "3.4.3"
 
 
 
@@ -28,6 +29,10 @@ ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview
 material3 = { group = "androidx.compose.material3", name = "material3" }
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
+koinCore = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koinAndroid = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+#koinViewModel = { module = "io.insert-koin:koin-androidx-viewmodel", version.ref = "koin" }
+
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofitConverter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 
@@ -35,6 +40,8 @@ jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigation-runtime-ktx" }
 compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-runtime-ktx" }
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
+koinCompose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -44,3 +51,4 @@ jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "k
 ui = ["ui", "materialIconExt", "ui-graphics", "ui-tooling-preview", "material3", "coil"]
 core = ["core-ktx", "lifecycle-runtime-ktx", "activity-compose", "compose-navigation", "navigation-runtime-ktx", "runtime-livedata", "lifecycle-livedata-ktx"]
 network = ["retrofit", "retrofitConverter", "jsoup"]
+di = ["koinCore", "koinAndroid", "koinCompose"]

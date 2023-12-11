@@ -10,11 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.fivesysdev.standwithukraine.screens.MainScreen
 import com.fivesysdev.standwithukraine.ui.theme.StandWithUkraineTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,7 +32,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(it)
                                     .border(1.dp, MaterialTheme.colorScheme.primary)
                             ) {
-                                Greeting("Android")
+                                MainScreen().Screen()
                             }
 
                         }
@@ -43,12 +41,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
 }

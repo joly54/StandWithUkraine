@@ -40,7 +40,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.4"
     }
     packaging {
         resources {
@@ -54,4 +54,5 @@ dependencies {
     implementation(libs.bundles.ui)
     implementation(libs.bundles.network)
     implementation(platform(libs.compose.bom))
+    implementation(libs.bundles.di)
 }
