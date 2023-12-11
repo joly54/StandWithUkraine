@@ -1,5 +1,5 @@
 [versions]
-agp = "8.3.0-alpha16"
+agp = "8.2.0"
 kotlin = "1.9.20"
 core-ktx = "1.12.0"
 lifecycle-runtime-ktx = "2.6.2"
@@ -40,6 +40,8 @@ jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigation-runtime-ktx" }
 compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-runtime-ktx" }
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
+koinCompose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -49,4 +51,4 @@ jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "k
 ui = ["ui", "materialIconExt", "ui-graphics", "ui-tooling-preview", "material3", "coil"]
 core = ["core-ktx", "lifecycle-runtime-ktx", "activity-compose", "compose-navigation", "navigation-runtime-ktx", "runtime-livedata", "lifecycle-livedata-ktx"]
 network = ["retrofit", "retrofitConverter", "jsoup"]
-di = ["koinCore", "koinAndroid"]
+di = ["koinCore", "koinAndroid", "koinCompose"]
