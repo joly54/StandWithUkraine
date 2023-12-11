@@ -49,7 +49,7 @@ class StatisticViewModel(
             } catch (e: Exception) {
                 _statisticState.value = StatisticState.Error(e.message.toString())
                 _statistic.value = Statistic(null, e.message.toString())
-                println(e.message)
+                e.printStackTrace()
             }
         }
     }
